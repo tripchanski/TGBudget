@@ -1,0 +1,48 @@
+version: "3"
+
+services:
+  bot:
+    build: ./bot
+    env_file: .env
+    depends_on:
+      - api
+    restart: always
+
+  # db:
+  #   image: postgres:15
+  #   restart: always
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #   volumes:
+  #     - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  #     - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: ./api
+    restart: always
+    env_file:
+      - path: ./.env
+        required: true
+    ports:
+      - "8001:8000"
+    expose:
+      - "8000"
+    command: "uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+    environment:
+      - DEBUG=true
+
+  nginx:
+    image: nginx:1.17
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf
+    ports:
+      - 8000:80
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

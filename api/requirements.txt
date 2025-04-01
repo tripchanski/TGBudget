@@ -1,0 +1,10 @@
+fastapi
+pydantic
+uvicorn
+sqlalchemy
+requests
+
+beautifulsoup4
+
+asyncpg
+psycopg2-binary
